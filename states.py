@@ -1,0 +1,1 @@
+END, FULLNAME, AGE, CONTACT, LOCATION = range(-1, 4)
