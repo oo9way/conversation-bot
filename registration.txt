@@ -1,9 +1,0 @@
-Bot vazifasi, oddiy foydalanuvchini ro'yxatdan o'tkazish
-
-Ro'yxatdan o'tkazish jarayoni
-# Ism Familiya
-# Yosh
-# Telefon kontakti
-# Manzil
-
-Ro'yxatdan o'tgan foydalanuvchilarni admin userlarga yuborish

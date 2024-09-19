@@ -1,37 +1,71 @@
-from telegram.ext import Dispatcher, CommandHandler, ConversationHandler, MessageHandler, Filters
+from telegram.ext import Dispatcher, Updater, CommandHandler, ConversationHandler, MessageHandler, Filters, CallbackQueryHandler
 from telegram import Bot
-from handlers import commands, registration
+from handlers import commands, registration, common, cart
 import states
 
-bot = Bot(token="7016866044:AAGjCKp8EiQsHb7Ems0SNuTcfME5WJ9H0Zo")
-dispatcher = Dispatcher(bot, None, workers=0)
 
-dispatcher.add_handler(CommandHandler("start", commands.start))
-dispatcher.add_handler(CommandHandler("help", commands.help))
-dispatcher.add_handler(CommandHandler("contact", commands.contact))
+def main() -> None:
+    """Start the bot."""
+    # Create the Updater and pass it your bot's token.
+    updater = Updater("7016866044:AAGjCKp8EiQsHb7Ems0SNuTcfME5WJ9H0Zo")
+    dispatcher = updater.dispatcher
 
-
-dispatcher.add_handler(
-    ConversationHandler(
-        entry_points=[
-            CommandHandler("register", commands.register)
-        ],
-        states={
-            states.FULLNAME: [
-                MessageHandler(Filters.all, registration.get_fullname)
+    dispatcher.add_handler(CommandHandler("start", commands.start))
+    dispatcher.add_handler(CommandHandler("help", commands.help))
+    dispatcher.add_handler(CommandHandler("language", commands.language))
+    dispatcher.add_handler(CommandHandler("contact", commands.contact))
+    dispatcher.add_handler(
+        ConversationHandler(
+            entry_points=[
+                MessageHandler(Filters.text("cart"), cart.view_cart)
             ],
-            states.AGE: [
-                MessageHandler(Filters.all, registration.get_age)
-            ],
-            states.CONTACT: [
-                MessageHandler(Filters.all, registration.get_contact)
-            ],
-            states.LOCATION: [
-                MessageHandler(Filters.location, registration.get_location)
+            states={
+                states.CART_ACTIONS: [
+                    CallbackQueryHandler(cart.cart_action)
+                ]
+            },
+            fallbacks=[
+                dispatcher.add_handler(CommandHandler("start", commands.start))
             ]
-        },
-        fallbacks=[
-            CommandHandler("help", commands.help)
-        ]
+        )
     )
-)
+
+
+    dispatcher.add_handler(
+        ConversationHandler(
+            entry_points=[
+                MessageHandler(Filters.text("📚 Kitoblar"), common.get_books),
+                MessageHandler(Filters.text("📚 Knigi"), common.get_books),
+                MessageHandler(Filters.text("📚 Books"), common.get_books),
+                MessageHandler(Filters.text("books"), common.get_books)
+            ],
+            states={
+                states.BOOK_SINGLE: [
+                    CallbackQueryHandler(common.get_book)
+                ],
+                states.BOOK_ACTION: [
+                    CallbackQueryHandler(common.get_book_action)
+                ],
+                states.GET_ORDER: [
+                    MessageHandler(Filters.text, common.get_book_order)
+                ]
+            },
+            fallbacks=[
+                CommandHandler("start", commands.start)
+            ]
+        )
+    )
+    dispatcher.add_handler(CallbackQueryHandler(common.set_language))
+
+    # Start the Bot
+    updater.start_polling()
+
+    # Run the bot until you press Ctrl-C or the process receives SIGINT,
+    # SIGTERM or SIGABRT. This should be used most of the time, since
+    # start_polling() is non-blocking and will stop the bot gracefully.
+    updater.idle()
+
+
+
+if __name__ == "__main__":
+    main()
