@@ -1,10 +1,9 @@
 from telegram import Update, ReplyKeyboardRemove
-from telegram.ext import CallbackContext
+from telegram.ext import CallbackContext, PollAnswerHandler
 from translation import get_translation as _
-from python_db import BOOKS
 from keyboards import replies, inlines
 import states
-
+from db import get_books_by_type, get_book_by_id
 
 def set_language(update: Update, context: CallbackContext):
     context.user_data["language"] = update.callback_query.data
@@ -18,13 +17,14 @@ def get_books(update: Update, context: CallbackContext):
     books = ""
     book_list = []
 
+    BOOKS = get_books_by_type()
+
     for book in BOOKS:
-        if book["_type"] == "paper":
-            book_list.append(book)
-            books += "======================\n"
-            books += f"Nomi: {book['title']}\n"
-            books += f"Narxi: {book['price']}\n"
-            books += "======================\n\n"
+        book_list.append(book)
+        books += "======================\n"
+        books += f"Nomi: {book[1]}\n"
+        books += f"Narxi: {book[3]}\n"
+        books += "======================\n\n"
 
 
     if not books:
@@ -43,12 +43,13 @@ def get_book(update:Update, context:CallbackContext):
     book_id = int(update.callback_query.data.split("-")[-1])
     update.callback_query.answer()
     update.callback_query.message.delete()
-    book = None
 
-    for item in BOOKS:
-        if item['id'] == book_id:
-            book = item
-            break
+    # for item in get_books_by_type():
+    #     if item['id'] == book_id:
+    #         book = item
+    #         break
+
+    book = get_book_by_id(book_id)
 
     if not book:
         update.message.reply_text("Siz izlagan kitob topilmadi", )
@@ -56,11 +57,11 @@ def get_book(update:Update, context:CallbackContext):
     
     context.user_data["selected_book"] = book_id
 
-    caption = f"<b>{book['title']}</b>\n"
-    caption += f"<b>Narxi:</b> {book['price']}\n"
-    caption += f"<b>Tavsif:</b> {book['description']}"
+    caption = f"<b>{book[1]}</b>\n"
+    caption += f"<b>Narxi:</b> {book[3]}\n"
+    caption += f"<b>Tavsif:</b> {book[5]}"
 
-    update.callback_query.message.reply_photo(photo=book['cover'], caption=caption, parse_mode="html", reply_markup=inlines.get_book_actions())
+    update.callback_query.message.reply_photo(photo=book[6], caption=caption, parse_mode="html", reply_markup=inlines.get_book_actions())
     return states.BOOK_ACTION
 
 

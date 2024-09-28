@@ -1,8 +1,7 @@
-from telegram.ext import Dispatcher, Updater, CommandHandler, ConversationHandler, MessageHandler, Filters, CallbackQueryHandler
-from telegram import Bot
+from telegram.ext import Dispatcher, Updater, CommandHandler, ConversationHandler, MessageHandler, Filters, CallbackQueryHandler, CallbackContext, PollHandler, PollAnswerHandler
+from telegram import Bot, Update
 from handlers import commands, registration, common, cart
 import states
-
 
 def main() -> None:
     """Start the bot."""
@@ -14,6 +13,12 @@ def main() -> None:
     dispatcher.add_handler(CommandHandler("help", commands.help))
     dispatcher.add_handler(CommandHandler("language", commands.language))
     dispatcher.add_handler(CommandHandler("contact", commands.contact))
+
+    # dispatcher.add_handler(PollHandler(poll_handler))
+    
+    # # Handler for poll answers
+    # dispatcher.add_handler(PollAnswerHandler(poll_answer_handler))
+
     dispatcher.add_handler(
         ConversationHandler(
             entry_points=[

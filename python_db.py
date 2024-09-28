@@ -2,6 +2,7 @@ BOOKS = [
     {
         "id": 1,
         "title": "Sariq devni minib",
+        'isbn': 50450,
         "price": 25000,
         "description": """I'm using Python/SQLite for accessing database. After running the query, 
         and getting the result, I want to know the number of rows, the number of columns, and the name of
@@ -12,6 +13,7 @@ BOOKS = [
     {
         "id": 2,
         "title": "Harry Potter",
+        'isbn': 50450,
         "price": 56800,
         "description": """I'm using Python/SQLite for accessing database. After running the query, 
         and getting the result, I want to know the number of rows, the number of columns, and the name of
@@ -23,6 +25,7 @@ BOOKS = [
     {
         "id": 3,
         "title": "Kichkina Shaxzoda",
+        'isbn': 50450,
         "price": 14000,
         "description": """I'm using Python/SQLite for accessing database. After running the query, 
         and getting the result, I want to know the number of rows, the number of columns, and the name of
@@ -34,6 +37,7 @@ BOOKS = [
     {
         "id": 4,
         "title": "O'tgan kunlar",
+        'isbn': 50450,
         "price": 2200,
         "description": """I'm using Python/SQLite for accessing database. After running the query, 
         and getting the result, I want to know the number of rows, the number of columns, and the name of
@@ -44,6 +48,7 @@ BOOKS = [
     {
         "id": 5,
         "title": "Otamdan qolgan dalalar",
+        'isbn': 50450,
         "price": 90000,
         "description": """I'm using Python/SQLite for accessing database. After running the query, 
         and getting the result, I want to know the number of rows, the number of columns, and the name of

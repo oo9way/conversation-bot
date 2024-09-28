@@ -1,6 +1,6 @@
 from telegram import Update
 from telegram.ext import CallbackContext
-from python_db import get_book_by_id
+from db import get_book_by_id, create_order, create_order_item
 from keyboards import inlines, replies
 import constants, states
 
@@ -17,13 +17,13 @@ def view_cart(update: Update, context: CallbackContext):
     for item in cart_items:
         book = get_book_by_id(item['book_id'])
         if book:
-            item['title'] = book['title']
+            item['title'] = book[1]
             items_for_buttons.append(item)
-            total_amount += book['price'] * item['amount']
-            message += f"Kitob: {book['title']} \n"
-            message += f"Narxi: {book['price']} \n"
+            total_amount += int(book[3]) * item['amount']
+            message += f"Kitob: {book[1]} \n"
+            message += f"Narxi: {book[3]} \n"
             message += f"Soni: {item['amount']} \n"
-            message += f"Umumiy summa: {book['price'] * item['amount']} \n"
+            message += f"Umumiy summa: {int(book[3]) * item['amount']} \n"
             message += "========================\n\n"
     
     message += f"Jami summa: {total_amount}"
@@ -48,15 +48,20 @@ def cart_action(update: Update, context: CallbackContext):
         for item in cart_items:
             book = get_book_by_id(item['book_id'])
             if book:
-                item['title'] = book['title']
-                total_amount += book['price'] * item['amount']
-                message += f"Kitob: {book['title']} \n"
-                message += f"Narxi: {book['price']} \n"
+                item['title'] = book[1]
+                total_amount += int(book[3]) * item['amount']
+                message += f"Kitob: {book[1]} \n"
+                message += f"Narxi: {int(book[3])} \n"
                 message += f"Soni: {item['amount']} \n"
-                message += f"Umumiy summa: {book['price'] * item['amount']} \n"
+                message += f"Umumiy summa: {int(book[3]) * item['amount']} \n"
                 message += "========================\n\n"
         
         message += f"Jami summa: {total_amount}"
+        order_id = create_order(update.callback_query.message.from_user.id, total_amount)
+
+        for item in cart_items:
+            book = get_book_by_id(item['book_id'])
+            create_order_item(item['book_id'], book[3], item['amount'], order_id)
 
         for admin in constants.ADMINS:
             context.bot.send_message(admin, message)
@@ -80,23 +85,19 @@ def cart_action(update: Update, context: CallbackContext):
 
         if action == "default":
             book = get_book_by_id(book_id)
-            update.callback_query.answer(book['title'])
+            update.callback_query.answer(book[1])
             return states.CART_ACTIONS
         
         elif action == "increase":
             new_cart_items = []
 
             for item in cart_items:
-                print(type(item['book_id']), type(book_id))
                 if item['book_id'] == book_id:
-                    print("Book ID equal", item['amount'])
                     item['amount'] = item['amount'] + 1
-                    print("New amont", item['amount'])
 
                 new_cart_items.append(item)
 
             context.user_data['cart'] = new_cart_items
-            
 
         elif action == "decrease":
             new_cart_items = []
@@ -126,13 +127,13 @@ def cart_action(update: Update, context: CallbackContext):
         for item in context.user_data['cart']:
             book = get_book_by_id(item['book_id'])
             if book:
-                item['title'] = book['title']
+                item['title'] = book[1]
                 items_for_buttons.append(item)
-                total_amount += book['price'] * item['amount']
-                message += f"Kitob: {book['title']} \n"
-                message += f"Narxi: {book['price']} \n"
+                total_amount += int(book[3]) * item['amount']
+                message += f"Kitob: {book[1]} \n"
+                message += f"Narxi: {book[3]} \n"
                 message += f"Soni: {item['amount']} \n"
-                message += f"Umumiy summa: {book['price'] * item['amount']} \n"
+                message += f"Umumiy summa: {int(book[3]) * item['amount']} \n"
                 message += "========================\n\n"
         
         message += f"Jami summa: {total_amount}"

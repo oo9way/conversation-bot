@@ -15,7 +15,7 @@ def get_language():
 def get_list_button(items):
     return InlineKeyboardMarkup(
         [
-            [InlineKeyboardButton(text=item['title'], callback_data=f"book-{item['id']}")] for item in items
+            [InlineKeyboardButton(text=item[1], callback_data=f"book-{item[0]}")] for item in items
         ]
     )
 
